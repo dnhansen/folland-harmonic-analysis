@@ -1,0 +1,943 @@
+% Document setup
+\documentclass[article, a4paper, 11pt, oneside]{memoir}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[UKenglish]{babel}
+
+% Document info
+\newcommand\doctitle{Folland: \emph{A Course in Abstract Harmonic Analysis}}
+\newcommand\docauthor{Danny Nygård Hansen}
+
+% Formatting and layout
+\usepackage[autostyle]{csquotes}
+\renewcommand{\mktextelp}{(\textellipsis\unkern)}
+\usepackage[final]{microtype}
+\usepackage{xcolor}
+\frenchspacing
+\usepackage{latex-sty/articlepagestyle}
+\usepackage{latex-sty/articlesectionstyle}
+
+% Fonts
+\usepackage{amssymb}
+\usepackage[largesmallcaps,partialup]{kpfonts}
+\DeclareSymbolFontAlphabet{\mathrm}{operators} % https://tex.stackexchange.com/questions/40874/kpfonts-siunitx-and-math-alphabets
+\linespread{1.06}
+% \let\mathfrak\undefined
+% \usepackage{eufrak}
+\DeclareMathAlphabet\mathfrak{U}{euf}{m}{n}
+\SetMathAlphabet\mathfrak{bold}{U}{euf}{b}{n}
+% https://tex.stackexchange.com/questions/13815/kpfonts-with-eufrak
+\usepackage{inconsolata}
+
+% Hyperlinks
+\usepackage{hyperref}
+\definecolor{linkcolor}{HTML}{4f4fa3}
+\hypersetup{%
+	pdftitle=\doctitle,
+	pdfauthor=\docauthor,
+	colorlinks,
+	linkcolor=linkcolor,
+	citecolor=linkcolor,
+	urlcolor=linkcolor,
+	bookmarksnumbered=true
+}
+
+% Equation numbering
+\numberwithin{equation}{chapter}
+
+% Footnotes
+\footmarkstyle{\textsuperscript{#1}\hspace{0.25em}}
+
+% Mathematics
+\usepackage{latex-sty/basicmathcommands}
+\usepackage{latex-sty/framedtheorems}
+\usepackage{latex-sty/probabilitycommands}
+\usepackage{tikz-cd}
+\tikzcdset{arrow style=math font} % https://tex.stackexchange.com/questions/300352/equalities-look-broken-with-tikz-cd-and-math-font
+\usetikzlibrary{babel}
+
+% Lists
+\usepackage{enumitem}
+\setenumerate[0]{label=\normalfont(\arabic*)}
+
+% Bibliography
+\usepackage[backend=biber, style=authoryear, maxcitenames=2, useprefix]{biblatex}
+\addbibresource{references.bib}
+
+% Title
+\title{\doctitle}
+\author{\docauthor}
+
+
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calV}{\mathcal{V}}
+\newcommand{\calW}{\mathcal{W}}
+\newcommand{\calT}{\mathcal{T}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calJ}{\mathcal{J}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calN}{\mathcal{N}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calP}{\mathcal{P}}
+
+\newcommand{\borel}[1]{\calB(#1)}
+
+
+\renewcommand\to[1][]{%
+    \ifstrempty{#1}{%
+        \rightarrow
+    }{%
+        \xrightarrow[#1]{}
+    }%
+}
+
+
+\begin{document}
+
+\maketitle
+
+\chapter{Banach Algebras and Spectral Theory}
+
+\section{Banach Algebras: Basic Concepts}
+
+\begin{remark}
+    Multiplication in a Banach algebra $\calA$ is continuous: For if $x,y,z,w \in \calA$, then
+    %
+    \begin{equation*}
+        \norm{xy - zw}
+            \leq \norm{xy - zy} + \norm{zy - zw}
+            \leq \norm{x - z} \, \norm{y} + \norm{z} \, \norm{y - w},
+    \end{equation*}
+    %
+    and this approaches zero when $z \to x$ and $w \to y$.
+\end{remark}
+
+\begin{remark}
+    In Lemma~1.5 and Proposition~1.6, Folland shows that the spectrum $\sigma(x)$ of an element $x$ of a unital Banach algebra is nonempty. To to this, he first shows that
+    %
+    \begin{equation*}
+        \frac{R(\mu) - R(\lambda)}{\mu - \lambda}
+            = - R(\lambda) R(\mu)
+    \end{equation*}
+    %
+    for $\lambda, \mu \not\in \sigma(x)$ with $\lambda \neq \mu$, where $R(\lambda) = (\lambda e - x)\inv$ is the resolvent of $x$. If $\phi \in \calA^*$, then linearity implies that
+    %
+    \begin{equation*}
+        \frac{\phi \circ R(\mu) - \phi \circ R(\lambda)}{\mu - \lambda}
+            = - \phi(R(\lambda) R(\mu)),
+    \end{equation*}
+    %
+    after which continuity implies that
+    %
+    \begin{equation*}
+        \frac{\phi \circ R(\mu) - \phi \circ R(\lambda)}{\mu - \lambda}
+            \to - \phi(R(\lambda)^2)
+    \end{equation*}
+    %
+    as $\mu \to \lambda$, showing that $\phi \circ R$ is holomorphic on $\complex \setminus \sigma(x)$.
+
+    Next, assuming that $\sigma(x)$ is empty, $\phi \circ R$ is entire and $\phi \circ R(\lambda) \to 0$ as $\lambda \to \infty$. Hence $\phi \circ R$ is identically zero, and we claim that $R$ is also identically zero. For assume that there is a $\lambda \in \complex$ such that $R(\lambda) \neq 0$. The Hahn--Banach extension theorem now implies the existence of a nonzero functional $\phi \in \calA^*$ with $\phi(R(\lambda)) = \norm{R(\lambda)} \neq 0$, which is impossible.
+\end{remark}
+
+\begin{remark}
+    The Gelfand--Mazur theorem clearly doesn't hold in the case $\calA = 0$. Hence we must assume that $\calA$ is nontrivial, i.e. that $\dim \calA > 0$, or equivalently that $0 \neq e$. We may instead assume, as e.g. Rudin does, that $\norm{e} = 1$.
+    
+    On the contrary, results like Lemma~1.3 and Theorem~1.4 hold trivially. One might be tempted to conclude that they do not, but recall that $0$ is invertible in the trivial algebra.
+
+    However, Folland again seems to implicitly assume that $\dim \calA > 0$ later, in Theorem~1.13(a). Here he claims that the Gelfand transform of $e$ is identically $1$, but this is not the case if $\calA = 0$.
+
+    Hence I think it makes sense to just assume that every Banach algebra is nontrivial.
+\end{remark}
+
+\begin{remark}[Geometric series]
+    We give a proof of Lemma~1.3. Let $x \in \calA$ with $\calA$ unital and $\norm{x} < 1$. Then $\norm{x^n} \leq \norm{x}^n$, and so the series $\sum_{n=0}^\infty \norm{x^n}$ converges by the comparison test. Since $\calA$ is complete, it follows that $\sum_{n=0}^\infty x^n$ also converges.
+
+    Now notice that
+    %
+    \begin{equation*}
+        (e-x) \sum_{i=0}^n x^i
+            = \sum_{i=0}^n x^i - \sum_{i=0}^n x^{i+1}
+            = e - x^{n+1}
+            \to[n\to\infty] e,
+    \end{equation*}
+    %
+    so continuity of multiplication implies that $\sum_{i=0}^\infty x^n$ is a right inverse to $e-x$. We similarly find that it is a left inverse, which proves the lemma.
+\end{remark}
+
+\newcommand{\ev}{\mathrm{ev}}
+
+\begin{remark}
+    We elaborate on the inequality $\limsup_{n\to\infty} \norm{x^n}^{1/n} \leq \rho(x)$ in Theorem~1.8, inspired by the proof in \textcite[Theorem~1.7.3]{arveson2002}.
+
+    Consider the function $f \colon D(0,1/\rho(x)) \to \complex$ given by
+    %
+    \begin{equation*}
+        f(z)
+            = \phi \bigl( (e - zx)\inv \bigr).
+    \end{equation*}
+    %
+    Notice that this is well-defined: If $z = 0$ then this is obvious. If $z \neq 0$ then $1/\abs{z} > \rho(x)$, so $z\inv$ does not lie in $\sigma(x)$, and hence
+    %
+    \begin{equation*}
+        z\inv e - x
+            = z\inv (e - zx)
+    \end{equation*}
+    %
+    is invertible. We claim that $f$ is holomorphic on its domain. For $z \neq 0$ we have $f(z) = z\inv (\phi \circ R)(z\inv)$, and when $z$ lies in the punctured disk $D'(0,1/\rho(x))$, then
+    %
+    \begin{equation*}
+        z\inv
+            \in \complex \setminus D(0,\rho(x))
+            \subseteq \complex \setminus \sigma(x).
+    \end{equation*}
+    %
+    But here $R$ is holomorphic by [ref], so $f$ is holomorphic on $D'(0,1/\rho(x))$. Next we show that $f$ is also holomorphic on the smaller disk $D(0,1/\norm{x})$ (smaller since $\rho(x) \leq \norm{x}$). If $z \neq 0$ then $1/\abs{z} > \norm{x}$, so [ref] implies that $z\inv e - x$ is invertible with inverse
+    %
+    \begin{equation*}
+        (z\inv e - x)\inv
+            = \sum_{n=0}^\infty x^n z^{n+1}.
+    \end{equation*}
+    %
+    It follows that
+    %
+    \begin{equation*}
+        f(z)
+            = z\inv \rho \bigl( (z\inv e - x)\inv \bigr)
+            = \sum_{n=0}^\infty \phi(x^n) z^n
+    \end{equation*}
+    %
+    by continuity of $\phi$. Since $f(0) = \phi(e) = \phi(x^0)$, the same formula holds for $z = 0$, and so $f$ is holomorphic on $D(0,1/\norm{x})$. Since $f$ is holomorphic on the larger disk $D(0,1/\rho(x))$, the above power series expansion also holds on this larger disk.
+
+    Fix $\lambda \in \complex$ with $\abs{\lambda} > \rho(x)$. Then $1/\abs{\lambda} < 1/\rho(x)$, so the above power series converges at $z = \lambda\inv$. It follows that there exist constants $C_\phi > 0$ such that $\abs{\phi(x^n)\lambda^{-n}} \leq C_\phi$ for all $n \in \naturals_0$. In other words,
+    %
+    \begin{equation*}
+        \sup_{n\in\naturals_0} \abs{\lambda^{-n}\ev_{x^n}(\phi)}
+            < \infty
+    \end{equation*}
+    %
+    for all $\phi \in \calA^*$. The uniform boundedness principle now implies that
+    %
+    \begin{equation*}
+        \sup_{n\in\naturals_0} \abs{\lambda}^{-n} \norm{x^n}
+            = \sup_{n\in\naturals_0} \norm{\lambda^{-n}\ev_{x^n}}
+            < \infty.
+    \end{equation*}
+    %
+    Here we use that $\ev \colon \calA \to \calA^{**}$ is an isometry. Hence there is a $C > 0$ such that $\abs{\lambda}^{-n} \norm{x^n} \leq C$ for all $n \in \naturals_0$, i.e. such that $\norm{x^n}^{1/n} \leq C^{1/n} \abs{\lambda}$. It follows that
+    %
+    \begin{equation*}
+        \limsup_{n\to\infty} \norm{x^n}^{1/n}
+            \leq \limsup_{n\to\infty} C^{1/n} \abs{\lambda}
+            = \abs{\lambda},
+    \end{equation*}
+    %
+    and since this holds for all $\lambda$ with $\abs{\lambda} > \rho(x)$, it follows that
+    %
+    \begin{equation*}
+        \limsup_{n\to\infty} \norm{x^n}^{1/n} \leq \rho(x)
+    \end{equation*}
+    %
+    as claimed.
+\end{remark}
+
+
+\section{Gelfand Theory}
+
+\begin{remark}
+    If $\calA$ is a commutative unital Banach algebra, Folland defines a \emph{multiplicative functional} on $\calA$ as a nonzero homomorphism from $\calA$ to $\complex$. For Folland, a homomorphism between Banach spaces is continuous, so continuity is assumed in the definition of multiplicative functionals.
+
+    However, some authors (e.g. Rudin) do not explicitly require continuity, and indeed this assumption is not necessary. In Proposition~1.10(c), Folland shows that if $h$ is a multiplicative functional on $\calA$, then $\abs{h(x)} \leq \norm{x}$ for all $x \in \calA$. But the proof of this fact does not assume that $h$ is continuous.
+\end{remark}
+
+\begin{remark}
+    The spectrum $\sigma(\calA)$ of a commutative unitary Banach algebra $\calA$ is a compact Hausdorff space in the weak$^*$ topology: It is compact by Alaoglu's theorem, and it is Hausdorff since a weak topology induced by a family $\calF$ of maps is Hausdorff if and only if $\calF$ separates points. And $\calA^{**}$ trivially separates points in $\calA^*$ since $\calA^{**}$ contains all evaluation maps from $\calA^*$ to $\complex$.
+
+    Folland remarks that the conditions $h \neq 0$ and $h(e) = 1$ are equivalent for algebra homomorphisms $h \colon \calA \to \complex$. This is useful, since the condition $h \neq 0$ naturally defines an \emph{open} subset of $\sigma(\calA)$, but we can translate this into the condition $h(e) = 1$ which naturally defines a \emph{closed} subset of $\sigma(\calA)$ (since this has the weak$^*$ topology).
+\end{remark}
+
+\newcommand{\calK}{\mathcal{K}}
+\newcommand{\frakm}{\mathfrak{m}}
+
+\begin{remark}
+    If $\calA$ is a commutative unital Banach algebra, then every proper ideal $J$ is contained in a maximal idea (Proposition~1.11(c)). For consider the set
+    %
+    \begin{equation*}
+        \calK
+            = \set{I \supseteq J}{\text{$I$ is a proper ideal in $\calA$}},
+    \end{equation*}
+    %
+    and let $\calC$ be a chain in $\calK$. Then the union $\bigunion_{I \in \calC} I$ is itself an ideal, and it is proper since it does not contain $e$. Hence $\calC$ has an upper bound in $\calK$, and Zorn's lemma implies that $\calK$ has a maximal element $\frakm$. Then $J \subseteq \frakm$, and $\frakm$ is a proper ideal in $\calA$. Furthermore, it is clearly a maximal ideal since any ideal that is larger would also be contained in $\calK$.
+\end{remark}
+
+\begin{remark}
+    Let $X$ be a normed space, and let $U$ be a subspace of $X$. We define a seminorm on $X/U$ by
+    %
+    \begin{equation*}
+        \norm{x + U}
+            = \inf_{u \in U} \norm{x - u}.
+    \end{equation*}
+    %
+    Since $U$ is a subspace, we could have used $x + u$ instead of $x - u$. This version of the definition makes the intuition explicit: The norm $\norm{x + U}$ is supposed to be the smallest distance betweeen $x$ and the origin in $X/U$, namely $U$. This is clearly positive, and it also satisfies the triangle inequality: For if $x,y \in X$ and $u,v \in U$, then
+    %
+    \begin{equation*}
+        \norm{x + U} + \norm{y + U}
+            \leq \norm{x - u} + \norm{y - v}
+            \leq \norm{(x + y) - (u + v)},
+    \end{equation*}
+    %
+    and this holds for all $u,v \in U$.
+
+    It follows from the theory of topological groups (and vector spaces) that $\norm{\,\cdot\,}$ is positive definite if and only if $U$ is closed in $X$. We may also give a more elementary (and geometric) argument: First assume that $U$ is closed, and let $x \not\in U$. Then there is an open ball with radius $r > 0$ centered at $x$ that is disjoint from $U$. But then $\norm{x - u} \geq r$ for all $u \in U$, so also $\norm{x + U} \geq r > 0$.
+
+    Conversely, assume that $\norm{\,\cdot\,}$ is positive definite, and let $x \not\in U$. Then $r = \norm{x + U} > 0$, so the open ball of radius $r$ centered at $x$ is disjoint from $U$. Thus $X \setminus U$ is open, and $U$ is closed.
+
+    Next recall that a normed space $X$ is complete if and only if, for every sequence $(x_n)_{n \in \naturals}$ in $X$, the convergence of the series $\sum_{n=1}^\infty \norm{x_n}$ implies the convergence in $X$ of the series $\sum_{n=1}^\infty x_n$.
+    
+    Assume that $X$ is complete and that $U$ is closed. We claim that $X/U$ is then also complete. Let $(x_n + U)_{n\in\naturals}$ be a sequence in $X/U$ such that the series $\sum_{n=1}^\infty \norm{x_n + U}$ converges. Notice that by the definition of the quotient norm we may choose the representatives $x_n$ such that $\norm{x_n} \leq \norm{x_n+U} + 2^{-n}$. It follows that
+    %
+    \begin{equation*}
+        \sum_{n=1}^\infty \norm{x_n}
+            \leq \sum_{n=1}^\infty \norm{x_n + U} + 1
+            < \infty,
+    \end{equation*}
+    %
+    which implies that the series $\sum_{n=1}^\infty x_n$ converges to some $x \in X$. We claim that the series $\sum_{n=1}^\infty (x_n+U)$ converges to $x + U$. We have
+    %
+    \begin{equation*}
+        \norm[\bigg]{ \sum_{i=1}^n (x_i + U) - (x + U) }
+            \leq \norm[\bigg]{ \sum_{i=1}^n x_i - x + U }
+            \leq \norm[\bigg]{ \sum_{i=1}^n x_i - x }
+    \end{equation*}
+    %
+    by definition of the quotient norm, and this converges to zero as $n \to \infty$. Thus $X/U$ is complete.
+
+    Finally, this obviously holds for the quotient algebra $\calA/J$ in the case of a Banach algebra $\calA$ and a closed two-sided ideal $J$. It remains to be shown that $\calA/J$ is in fact a Banach algebra, i.e. that it satisfies the Banach inequality. Let $x,y \in \calA$ and $j,k \in J$ and notice that
+    %
+    \begin{equation*}
+        (x-j)(y-k)
+            = xy - xk - jy + jk.
+    \end{equation*}
+    %
+    Since $J$ is a two-sided ideal, $xk + jy - jk \in J$, and so
+    %
+    \begin{equation*}
+        \norm{xy + J}
+            \leq \norm{xy - xk - jy + jk}
+            \leq \norm{(x-j)(y-k)}
+            \leq \norm{x-j} \, \norm{y-k},
+    \end{equation*}
+    %
+    where the last inequality follows from the Banach inequality in $\calA$. Taking infima on the right-hand side implies the claim.
+\end{remark}
+
+
+\begin{remark}
+    We comment on the general assumption that $\calA$ be commutative in Gelfand theory. If $\calA$ is noncommutative, then we can still talk about multiplicative functionals (i.e. characters) and ideals, and [remark above] indicates that we need an ideal $J$ to be two-sided to define a multiplication on $\calA/J$.
+    
+    However, if $\frakm$ is a maximal two-sided ideal in $\calA$, then $\calA/\frakm$ is not necessarily a division ring: The argument of Theorem~1.12 still shows that $\calA/\frakm$ has no nontrivial ideals, but we can no longer conclude that every nonzero element in $\calA/\frakm$ is invertible. If $x \in \calA/\frakm$ is nonzero, then the two-sided ideal generated by $x$ is $(x) = \set{mxn}{m,n \in \frakm}$, and indeed $(x) = \calA/\frakm$, but this only allows us to conclude that $e$ is on the form $mxn$. Hence we cannot conclude that every maximal ideal in $\calA$ is the kernel of a character.
+
+    \newcommand{\im}{\operatorname{im}}
+
+    Next notice that the proof of the Gelfand--Naimark theorem relies on the fact that for $x \in \calA$, $\norm{x^{2^k}} = \norm{x}^{2^k}$ for all $k \in \naturals$ implies that $\norm{\hat{x}}_\infty = \norm{x}$ (Proposition~1.19(a)). We sketch the proof of this fact to show that this requires commutativity. By the formula for the spectral radius in Theorem~1.8, this will follow if we can establish that $\rho(x) = \norm{\hat{x}}_\infty$ (Theorem~1.13(d)). This in turn follows if $\im \hat{x} = \sigma(x)$ (Theorem~1.13(c)). The proof of this fact begins as follows: For $\lambda \in \complex$ we have $\lambda \in \sigma(x)$ iff $\lambda e - x$ is singular. We would then like this to be equivalent to the existence of a $h \in \sigma(\calA)$ such that $\lambda - \hat{x}(h) = \lambda - h(x) = 0$. This will follow if $x$ is invertible if and only if $\hat{x}$ never vanishes (Theorem~1.13(b)). But this fact crucially depends on the one-to-one correspondence between characters and maximal ideals, and we have seen that this does not hold.
+
+    Thus the proof of the Gelfand--Naimark theorem fails in the noncommutative case.
+\end{remark}
+
+
+
+\begin{remark}[Semisimple algebras]
+    A commutative unital Banach algebra $\calA$ is \emph{semisimple} if the Gelfand transform $\Gamma_\calA$ is injective. We prove that this is the case if and only if the intersection of all maximal ideals of $\calA$ is $\{0\}$. In fact, we prove the following more general claim: If $\calM$ denotes the set of all maximal ideals in $\calA$, then $\ker\Gamma_\calA = \bigintersect_{\frakm\in\calM} \frakm$.
+
+    Let $x \in \calA$ lie in the intersection of all maximal ideals of $\calA$. By Theorem~1.12, this is the same as $x$ lying in the intersection of all kernels of elements $h \in \sigma(\calA)$. But since $\hat{x}(h) = h(x)$, this is the case if and only if $\hat{x} = 0$, i.e. if $x \in \ker \Gamma_\calA$. This proves the claim.
+
+    The alternative characterisation of semisimplicity now follows since $\Gamma_\calA$ is injective if and only if $\ker \Gamma_\calA = 0$.
+\end{remark}
+
+
+\begin{remark}
+    We elaborate on the proof of Proposition~1.22. Let $\calA$ is a unital Banach algebra and $\calB$ a closed subalgebra of $\calA$ containing $e$. If $x \in \calB$ such that $\sigma_\calB(x)$ is nowhere dense in $\complex$, then $\sigma_\calA(x) = \sigma_\calB(x)$. Since $\sigma_\calB(x)$ is already closed in $\complex$, the assumption is just that it has empty interior.
+
+    Since $\calB \subseteq \calA$ we clearly have $\sigma_\calA(x) \subseteq \sigma_\calB(x)$: it is easier to be invertible in $\calA$ than in $\calB$, so let $\lambda_0 \in \sigma_\calB(x)$. Since $\sigma_\calB(x)$ has empty interior, there is a sequence $(\lambda_n)_{n\in\naturals}$ in $\complex \setminus \sigma_\calB(x)$ that converges to $\lambda_0$. It follows that $\lambda_n e - x$ converges to $\lambda_0 e - x$ in $\calB$. The element $\lambda_0 e - x$ is by construction not invertible in $\calB$, but since a sequence of invertible elements converges to it, it must lie on the boundary of the set of invertible elements. Lemma~1.21 thus implies that $\norm{(\lambda_n e - x)\inv} \to 0$ as $n \to \infty$.
+    
+    If $\lambda_0 e - x$ were invertible in $\calA$, we would have $(\lambda_n e - x)\inv \to (\lambda_0 e - x)\inv$ by continuity of the inverse map. But this would imply that $\norm{(\lambda_n e - x)\inv} \to \norm{(\lambda_0 e - x)\inv} < \infty$, which contradicts the above. Hence $\lambda_0 \in \sigma_\calA(x)$ as claimed.
+\end{remark}
+
+
+\begin{remark}[The continuous functional calculus]
+    Folland uses Spectral Theorem I to derive the (bounded) Borel functional calculus. In this context, a \emph{functional calculus} is a map from a suitable function space to a set of operators. Given a bounded normal operator $T$ on a Hilbert space $\calH$, the Borel functional calculus allows us to apply Borel functions on $\sigma(T)$ to $T$ and yield an operator $f(T)$. In Theorem~1.51, Folland shows that this correspondence is a $*$-homomorphism, and it has the properties that $f(\indicator{\sigma(T)}) = I$ and $f(\id_{\sigma(T)}) = T$. (In fact, it is unique with these properties as we argue on [remark on uniqueness in Spectral Theorem I].)
+
+    There is also a \emph{continuous functional calculus} which applies more generally to normal elements of C$^*$-algebras.
+\end{remark}
+
+\begin{theorem}[The continuous functional calculus]
+    Let $\calA$ be a unital C$^*$-algebra and let $x \in \calA$ be normal. There is an isometric $*$-homomorphism $\pi \colon C(\sigma(x)) \to \calA$ such that
+    %
+    \begin{equation}
+        \label{eq:continuous-calculus}
+        \pi(\indicator{\sigma(x)}) = e
+        \quad \text{and} \quad
+        \pi(\id_{\sigma(x)}) = x.
+    \end{equation}
+    %
+    Furthermore, $\pi$ is the unique continuous $*$-homomorphism from $C(\sigma(x))$ to $\calA$ satisfying \cref{eq:continuous-calculus}.
+\end{theorem}
+
+\begin{proof}
+    Let $\calB$ be the sub-C$^*$-algebra of $\calA$ generated by $e$ and $x$. Then Proposition~1.23(b) implies that the spectrum of $x$ is the same when considered either as an element in $\calA$ or $\calB$, so we simply denote its spectrum by $\sigma(x)$. Furthermore, $\calB$ is commutative since $x$ is normal, and Proposition~1.15(a) implies that $\hat{x} \colon \sigma(\calB) \to \sigma(x)$ is a homeomorphism, in particular bijective, so the pullback $\hat{x}^* \colon C(\sigma(\calB)) \to C(\sigma(x))$ given by $\hat{x}^*(f) = f \circ \hat{x}$ is also bijective. It is obviously an isometric $*$-isomorphism.
+
+    Next, the inverse Gelfand transform $\Gamma\inv \colon C(\sigma(\calB)) \to \calB$ is also an isometric $*$-isomorphism by the Gelfand--Naimark theorem. Denoting by $\pi \colon C(\sigma(x)) \to \calA$ the composition
+    %
+    \begin{equation*}
+        \begin{tikzcd}
+            C(\sigma(x))
+                \ar[r, "\hat{x}^*"]
+            & C(\sigma(\calB))
+                \ar[r, "\Gamma\inv"]
+            & \calB
+                \ar[r, hookrightarrow]
+            & \calA,
+        \end{tikzcd}
+    \end{equation*}
+    %
+    then $\pi$ is an isometric $*$-homomorphism. Hence it preserves multiplicative identities, and so $\pi(\indicator{\sigma(x)}) = e$. Furthermore, since
+    %
+    \begin{equation*}
+        \hat{x}^*(\id_{\sigma(x)})
+            = \id_{\sigma(x)} \circ \hat{x}
+            = \hat{x}
+    \end{equation*}
+    %
+    we also have
+    %
+    \begin{equation*}
+        \pi(\id_{\sigma(x)})
+            = \Gamma\inv(\hat{x})
+            = x
+    \end{equation*}
+    %
+    as claimed.
+
+    Finally we prove uniqueness. If $\tau \colon C(\sigma(x)) \to \calA$ is a $*$-homomorphism satisfying \cref{eq:continuous-calculus}, then $\pi$ and $\tau$ agree on all polynomials in $\indicator{\sigma(x)}$, $\id_{\sigma(x)}$ and $\overline{\id_{\sigma(x)}}$. Let $\calP$ denote this algebra of polynomials. Notice that $\calP$ separates points (since $\id_{\sigma(x)}$ itself is such a polynomial), and that there is no point in $\sigma(x)$ at which all functions in $\calP$ vanish (since both $\indicator{\sigma(x)}$ and $\id_{\sigma(x)}$ lie in $\calP$). Hence the Stone--Weierstrass theorem implies that $\calP$ is dense in $C(\sigma(x))$. If $\tau$ is also continuous, then $\pi$ and $\tau$ also agree on the closure of $\calP$, so $\pi = \tau$.
+\end{proof}
+
+
+\section{Nonunital Banach Algebras}
+
+\begin{remark}
+    Let $\calA$ be a nonunital Banach algebra embedded in the unital Banach algebra $\tilde\calA$. Identifying $\calA$ with $\calA \prod \{0\}$ and $\complex$ with $\{0\} \prod \complex$ we have
+    %
+    \begin{equation*}
+        (x,a)
+            = (x, 0) + (0, a)
+            = x + a.
+    \end{equation*}
+    %
+    Hence this induces an addition on words over the set $\calA \union \complex$. If we require that the multiplication on $\tilde\calA$ distribute over this addition, we find that
+    %
+    \begin{align*}
+        (x,a)(y,b)
+            &= (x + a)(y + b)
+             = xy + ay + bx + ab \\
+            &= (xy,0) + (ay,0) + (bx,0) + (0,ab) \\
+            &= (xy + ay + bx, ab).
+    \end{align*}
+    %
+    Thus the multiplication on $\tilde\calA$ arises in a very natural way from the interpretation of the pair $(x,a)$ as a kind of sum of $x$ and $a$. This interpretation becomes perhaps slightly more convincing if we recall that $\tilde\calA$ as a vector space is in fact the direct \emph{sum} $\calA \oplus \complex$.
+\end{remark}
+
+
+\begin{remark}
+    There is a bijection
+    %
+    \begin{align*}
+        \Phi \colon \sigma(\tilde\calA) &\to \sigma(\calA) \union \{0\}, \\
+            H &\mapsto H|_\calA.
+    \end{align*}
+    %
+    We claim that $\Phi$ is in fact a homeomorphism. The domain is compact and the codomain Hausdorff, so it suffices to show that $\Phi$ is continuous. To do this it is sufficient to prove that $\iota \circ \Phi$ is continuous, where $\iota \colon \sigma(\calA) \union \{0\} \to \calA^*$ is the inclusion map.
+
+    Since $\calA^*$ has the weak topology induced by the collection $\set{\ev_x}{x \in \calA}$, it suffices to show that $\ev_x \circ \iota \circ \Phi$ is continuous for all $x$. But notice that, for $H \in \sigma(\tilde\calA)$,
+    %
+    \begin{equation*}
+        (\ev_x \circ \iota \circ \Phi)(H)
+            = (\ev_x \circ \iota)(H|_\calA)
+            = \ev_x(H|_\calA)
+            = H|_\calA(x)
+            = H(x,0)
+            = \ev_{(x,0)}(H),
+    \end{equation*}
+    %
+    and $\ev_{(x,0)}$ is continuous since $\sigma(\tilde\calA)$ carries the weak$^*$ topology. In total $\Phi$ is continuous hence a homeomorphism.
+\end{remark}
+
+\begin{remark}
+    Folland remarks that if $0$ is not an isolated point of $\sigma(\calA) \union \{0\}$, then $\sigma(\calA)$ is a locally compact Hausdorff space with one-point compactification $\sigma(\calA) \union \{0\} \cong \sigma(\tilde\calA)$. The role of $0$ in $\sigma(\tilde\calA)$ is played by $H_0 = \tilde 0$.
+
+    If $\calA$ is noncompact, Folland claims that $\hat{x}$ vanishes at infinity for all $x \in \calA$ (of course this is obvious if $\calA$ is in fact compact). Recall (e.g. from \textcite[Proposition~4.36]{folland2007}) that $\hat{x}$ extends continuously to $\sigma(\calA) \union \{0\}$ if and only if $\hat{x} = g + c$ for some $g \in C_0(\sigma(\calA))$ and $c \in \complex$, and that in this case $\hat{x}(0) = c$. But since $\sigma(\calA) \union \{0\} \cong \sigma(\tilde\calA)$ and the Gelfand transform of $(x,0)$ is continuous on $\sigma(\tilde\calA)$, $\tilde{x}$ does indeed extend continuously to $\sigma(\calA) \union \{0\}$. Furthermore,
+    %
+    \begin{equation*}
+        \hat{x}(0)
+            = \widehat{(x,0)}(\tilde 0)
+            = \widehat{(x,0)}(H_0)
+            = H_0(x,0)
+            = 0,
+    \end{equation*}
+    %
+    so $\hat{x} = g$ which vanishes at infinity.
+\end{remark}
+
+
+\begin{remarkbreak}[The nonunital Gelfand--Naimark theorem]
+    The Gelfand transform $\Gamma_{\tilde\calA} \colon \tilde\calA \to C(\sigma(\tilde\calA))$ is an isometric $*$-isomorphism. We claim that $\Gamma_{\tilde\calA}$ maps $\calA$ onto $C_0(\sigma(\calA))$. First notice that $C_0(\sigma(\calA))$ is indeed a subset of $C(\sigma(\tilde\calA))$, since every continuous function on $\sigma(\calA)$ vanishing at infinity extends to a continuous function on the one-point compactification $\sigma(\tilde\calA)$ of $\sigma(\calA)$ by letting the value of the function at $H_0 = \tilde 0$ be $0$.
+    
+    Next, $\calA$ is a maximal ideal of $\tilde\calA$, and $\calA = \ker H_0$. Since $\Gamma_{\tilde\calA}$ is in particular an algebra isomorphism, it maps $\calA$ to a maximal ideal of $C(\sigma(\tilde\calA))$. We claim that
+    %
+    \begin{equation*}
+        \Gamma_{\tilde\calA}(\ker H_0)
+            = \set{f \in C(\sigma(\tilde\calA))}{f(\tilde 0) = 0}.
+    \end{equation*}
+    %
+    Now let $z \in \tilde\calA$ and notice that $\hat{z}(\tilde 0) = \hat{z}(H_0) = H_0(z)$, so $\hat{z}(\tilde 0) = 0$ if and only if $z \in \ker H_0$. Since $\Gamma_{\tilde\calA}$ is surjective, every function $f \in C(\sigma(\tilde\calA))$ is on the form $\hat{z}$ for some $z \in \tilde\calA$, and so $f(\tilde 0) = 0$ if and only if $H_0(z) = 0$, confirming the above identity. But now notice that the right-hand side above is just $C_0(\sigma(\calA))$, proving the first claim.
+
+    Since $\Gamma_{\tilde\calA}$ restricted to $\calA$ is still an isometry, simply recall that $\Gamma_\calA$ is precisely this restriction. This proves the theorem.
+\end{remarkbreak}
+
+
+\section{The Spectral Theorem}
+
+\begin{remark}
+    Let $\calH$ be a Hilbert space. We define an ordering on the set of orthogonal projections on $\calH$ by letting $P \leq Q$ if $P\calH \subseteq Q\calH$. Notice that if $P \leq Q$, then $Q$ is the identity on $P\calH$, and so $QP = P$. By self-adjointness we also have $PQ = P$.
+
+    Next notice that $P\calH$ is a closed subspace of $\calH$. It is clearly a subspace, and to show that it is closed, let $(x_n)_{n\in\naturals}$ be a sequence in $P\calH$ that converges to some $x \in \calH$. It follows by continuity of $P$ that $x_n = Px_n \to Px$ as $n \to \infty$, so $x = Px \in P\calH$.
+
+    In the proof of Theorem~1.38(d), Folland uses Theorem~1.36(b) to show that the series $\sum_{n=1}^\infty P(E_n)$ converges weakly to $P(\bigunion_{n\in\naturals} E_n)$. The result in [proposition below] is a more general argument for the stronger result that the series in fact converges strongly. The lemma shows that weak (and hence strong) convergence is a general property of monotone sequences of orthogonal projections, and is not special to those that arise from projection-valued measures. (One can also characterise the weak limit explicitly, but it seems at least cumbersome to transfer this characterisation to the case of projection-valued measures.)
+\end{remark}
+
+\begin{lemma}
+    Let $(P_n)_{n\in\naturals}$ be a monotone sequence of orthogonal projections on $\calH$. Then $(P_n)$ converges weakly to an orthogonal projection.
+\end{lemma}
+
+\begin{proof}
+    For definiteness, assume that $(P_n)$ is increasing. The polarisation identity shows that
+    %
+    \begin{equation*}
+        \inner{P_n x}{y}
+            = \inner{P_n x}{P_n y}
+            = \frac{1}{4} \sum_{k=1}^4 \iu^k \norm{P_n x + \iu^k P_n y}
+            = \frac{1}{4} \sum_{k=1}^4 \iu^k \norm{P_n (x + \iu^k y)}
+    \end{equation*}
+    %
+    for $x,y \in \calH$. We first show that the sequence $(\norm{P_n z})_{n\in\naturals}$ converges for all $z \in \calH$. If it is constant and equal then this is obvious, so assume that $P_N z \neq 0$ for some $N \in \naturals$. Then since $P_n \leq P_{n+1}$ we have, for $n \geq N$, also $P_n n \neq 0$ and
+    %
+    \begin{equation*}
+        \norm{P_n z}
+            = \norm{P_n P_{n+1} z}
+            \leq \norm{P_n} \, \norm{P_{n+1} z}
+            = \norm{P_{n+1} z}.
+    \end{equation*}
+    %
+    Hence the sequence $(\norm{P_n z})_{n\in\naturals}$ is increasing. But it is also bounded by $\norm{z}$, so it converges. Thus the sequence $(\inner{P_n x}{y})_{n\in\naturals}$ converges.
+
+    Next notice that the map $B \colon \calH \prod \calH \to \complex$ given by $B(x,y) = \lim_{n\to\infty} \inner{P_n x}{y}$ is a bounded sequilinear form: It is clearly sesquilinear, and the calculation
+    %
+    \begin{equation*}
+        \abs{B(x,y)}
+            \leq \lim_{n\to\infty} \norm{P_n} \, \norm{x} \, \norm{y}
+            \leq \norm{x} \, \norm{y}
+    \end{equation*}
+    %
+    shows that it is also bounded. Hence there is a unique bounded linear operator $P$ on $\calH$ such that
+    %
+    \begin{equation*}
+        \lim_{n\to\infty} \inner{P_n x}{y}
+            = B(x,y)
+            = \inner{Px}{y}.
+    \end{equation*}
+    %
+    Thus $P_n \to P$ weakly. It remains to be shown that $P$ is an orthogonal projection. Since $B$ is symmetric, $P$ is self-adjoint. To show that it is also idempotent, let $m,n \in \naturals$ with $m \leq n$. Then
+    %
+    \begin{equation*}
+        \inner{P_m x}{y}
+            = \inner{P_n P_m x}{y}
+            = \inner{P_n x}{P_m y}
+            \to[n\to\infty] \inner{Px}{P_m y}
+            = \inner{P_m Px}{y}.
+    \end{equation*}
+    %
+    Letting $m \to \infty$ shows that $\inner{P x}{y} = \inner{P^2 x}{y}$, so $P = P^2$.
+\end{proof}
+
+
+\begin{proposition}
+    Let $(P_n)_{n\in\naturals}$ be a sequence of orthogonal projections on $\calH$. If $(P_n)$ converges weakly to an orthogonal projection $P$, then it also converges strongly to $P$.
+
+    In particular, if $(P_n)_{n\in\naturals}$ is monotone, then it converges strongly to an orthogonal projection.
+\end{proposition}
+
+\begin{proof}
+    Notice that, for $x \in \calH$,
+    %
+    \begin{align*}
+        \norm{P_n x - Px}^2
+            &= \inner{P_n x}{P_n x}
+               + \inner{Px}{Px}
+               - \inner{P_n x}{Px}
+               - \inner{Px}{P_n x} \\
+            &= \inner{P_n x}{x}
+            + \inner{Px}{x}
+            - \inner{P_n x}{Px}
+            - \conj{\inner{P_n x}{Px}} \\
+            &\to[n\to\infty] \inner{Px}{x}
+            + \inner{Px}{x}
+            - \inner{Px}{Px}
+            - \conj{\inner{Px}{Px}} \\
+            &= 0.
+    \end{align*}
+    %
+    The second claim follows from [lemma].
+\end{proof}
+
+
+% \begin{remark}
+%     Let $(\Omega, \calE)$ be a measurable space, let $A \in \calE$, and let $P$ be an $\calH$-projection-valued measure on $(A, \calE_A)$. We may extend $P$ to a projection-valued measure $\tilde{P}$ on $\calE$ by letting $\tilde{P}(E) = P(E \intersect A)$ for any $E \in \calE$. Then $P_{u,v}$ is just the restriction of $\tilde{P}_{u,v}$ to $A$ for $u,v \in \calH$, so
+%     %
+%     \begin{equation*}
+%         \int_A f|_A \dif P_{u,v}
+%             = \int_\Omega f \indicator{A} \dif \tilde{P}_{u,v}
+%     \end{equation*}
+%     %
+%     for any bounded Borel function $f$ on $\Omega$.
+% \end{remark}
+
+
+\begin{remarkbreak}[Uniqueness in Spectral Theorem I]
+    If $P$ and $Q$ are regular projection-valued measures on $\Sigma$ such that $\int \hat{T} \dif P = \int \hat{T} \dif Q$ for all $T \in \calA$, then these give rise to regular complex Borel measures $P_{u,v}$ and $Q_{u,v}$ for $u,v \in \calH$, e.g. by $P_{u,v} = \inner{P(E)u}{v}$. By definition of the integrals with respect to $P$ and $Q$ we have
+    %
+    \begin{equation}
+        \label{eq:spectral-theorem-uniqueness}
+        \int f \dif P_{u,v}
+            = \inner[\bigg]{ \biggl( \int f \dif P \biggr) u }{v}
+            = \inner[\bigg]{ \biggl( \int f \dif Q \biggr) u }{v}
+            = \int f \dif Q_{u,v}
+    \end{equation}
+    %
+    for all $f \in C(\Sigma)$, since every such function in on the form $\hat{T}$ for some $T \in \calA$. By the uniqueness part of the Riesz representation theorem, $P_{u,v} = Q_{u,v}$. But then $\inner{P(E)u}{v} = \inner{Q(E)u}{v}$, and since this holds for all $u,v \in \calH$ we have $P(E) = Q(E)$.
+
+    However, this argument depends on the assumption that $P$ and $Q$ are regular. But this is always the case: \textcite[Theorem~7.8]{folland2007} guarantees that the positive measures $P_{u,v}$ and $Q_{u,v}$ are regular, since $\Sigma$ is compact Hausdorff and each measure is finite. (Strictly speaking the theorem is proved for positive measures, but we may instead apply it to the real and imaginary parts of $P_{u,v}$ and $Q_{u,v}$.)
+
+    Furthermore, it is in fact sufficient that $\int \id_\Sigma \dif P = \int \id_\Sigma \dif Q$: Let $\calF$ be the subset of $C(\Sigma)$ of those functions $f$ such that $\int f \dif P = \int f \dif Q$. Clearly $\calF$ contains all polynomials in $\id_\Sigma$ and $\conj{\id_\Sigma}$, so $\calF$ is dense in $C(\Sigma)$ by the Stone--Weierstrass theorem. Then let $f \in C(\Sigma)$, and let $(f_n)_{n\in\naturals}$ be a sequence in $\calF$ converging to $f$. Since $\norm{\int f \dif P} \leq \norm{f}_\infty$ and similarly for $Q$, it follows that
+    %
+    \begin{align*}
+        \norm[\bigg]{ \int f \dif P - \int f \dif Q }
+            &= \norm[\bigg]{ \int (f - f_n) \dif P + \int f_n \dif P - \int f_n \dif Q + \int (f_n - f) \dif Q } \\
+            &\leq \norm[\bigg]{ \int (f_n - f) \dif P} + \norm[\bigg]{ \int (f_n - f) \dif Q } \\
+            &\leq 2 \norm{f_n - f}_\infty.
+    \end{align*}
+    %
+    This approaches zero as $n \to \infty$, showing that $\calF = C(\Sigma)$.
+\end{remarkbreak}
+
+
+\begin{remark}
+    Since the continuous functional calculus works for elements of any C$^*$-algebra, we might wonder whether the Borel functional calculus can be similarly generalised.
+    
+    We know how to integrate Borel functions with respect to any $\calH$-projection-valued measure $P$ on a measurable space $(\Omega, \calE)$: This induces complex measures on $\calE$ by
+    %
+    \begin{equation*}
+        P_{u,v}(E)
+            = \inner{P(E)u}{v}
+    \end{equation*}
+    %
+    for $u,v \in \calH$. The integral of a bounded Borel function $f$ on $\Omega$ is then defined so that
+    %
+    \begin{equation*}
+        \inner[\bigg]{ \biggl( \int f \dif P \biggr) u }{v}
+            = \int f \dif P_{u,v}.
+    \end{equation*}
+    %
+    The question is now whether a general commutative unital C$^*$-algebra $\calA$ can induce a suitable projection-valued measure, and if so with values in which Hilbert space. Already here we see that this might not be possible: If $\calA$ is a subalgebra of $\calL(\calH)$ then $\calH$ is of course a natural choice, but it's not clear what we should choose in general. Perhaps it is possible to generalise the definition of projection-valued measures to general C$^*$-algebras?
+
+    If $\sigma(\calA)$ is the spectrum of $\calA$ and $\Gamma \colon \calA \to C(\sigma(\calA))$ the Gelfand transform, this induces a map $P \colon \borel{\sigma(\calA)} \to \calA$ by $P(E) = \Gamma\inv(\indicator{E})$. Notice that e.g.,
+    %
+    \begin{equation*}
+        P(E \intersect F)
+            = \Gamma\inv(\indicator{E \intersect F})
+            = \Gamma\inv(\indicator{E} \indicator{F})
+            = \Gamma\inv(\indicator{E}) \Gamma\inv(\indicator{F})
+            = P(E) P(F).
+    \end{equation*}
+    %
+    We similarly have $P(E \union F) = P(E) + P(F)$ if $E \intersect F = \emptyset$. Hence $P$ has many of the properties we desire in a `projection'-valued measure.
+    
+    But already we are in trouble, for since the elements of $\calA$ are not operators, we cannot form an inner product similar to $\inner{P(E)u}{v}$ above. Maybe we can take a different approach. Let $s \colon \sigma(\calA) \to \complex$ be a simple Borel function with standard representation $s = \sum_{i=1}^n a_i \indicator{E_i}$. Define the integral of $s$ with respect to $P$ by
+    %
+    \begin{equation*}
+        \int s \dif P
+            = \sum_{i=1}^n a_i P(E_i).
+    \end{equation*}
+    %
+    This agrees with the usual definition in the case $\calA = \calL(\calH)$ as shown on p.~21 of \textcite{follandharmonic}, at least if it is well-defined. The proof of this fact is identical to the proof that the usual Lebesgue integral of a simple function is well-defined, but we include it for completeness:
+    
+    Let $s = \sum_{j=1}^m b_j \indicator{F_j}$ be another standard representation of $s$, and notice that
+    %
+    \begin{equation*}
+        \sum_{i=1}^n a_i P(E_i)
+            = \sum_{i=1}^n \sum_{j=1}^m a_i P(E_i \intersect F_j)
+        \quad \text{and} \quad
+        \sum_{j=1}^m b_j P(F_j)
+            = \sum_{j=1}^m \sum_{i=1}^n b_i P(E_i \intersect F_j).
+    \end{equation*}
+    %
+    If $E_i \intersect F_j = \emptyset$, then $P(E_i \intersect F_j) = \Gamma\inv(\indicator{\emptyset}) = 0$. Otherwise there exists $x \in E_i \intersect F_j$, and since the $E_i$ and $F_j$ are disjoint we have $a_i = s(x) = b_j$. Hence
+    %
+    \begin{equation*}
+            a_i P(E_i \intersect F_j)
+                = b_j P(E_i \intersect F_j),
+    \end{equation*}
+    %
+    and so the integral is well-defined.
+
+    But how to extend this to general (bounded) Borel functions? Folland has the luxury of inner products, and another approach is to take strong limits which again requires that the $P(E)$ are operators. We of course do not have access to a kind of `strong' topology in this generality, but recall that the integral with respect to an actual projection-valued measure $Q$ of a bounded Borel function is the limit \emph{in the norm topology} of integrals of simple functions. Perhaps we can define the integral with respect to $P$ in a similar way.
+
+    However, this fact depends on an inequality on the form
+    %
+    \begin{equation*}
+        \norm[\bigg]{ \int f \dif Q }
+            \leq k \norm{f}_\infty
+    \end{equation*}
+    %
+    for some $k > 0$ (Folland proves this first for $k = 4$ and then for $k = 1$), and the proof of this goes through the theory of sesquilinear forms. It is difficult to see how it would be possible to prove such an inequality without these more specific tools.
+\end{remark}
+
+
+\subsection{Essentially bounded functions}
+
+\newcommand{\meas}[1]{\mathcal{M}(#1)}
+\newcommand{\essran}{\operatorname{im}_\infty}
+
+\begin{definition}
+    Let $f \in \meas{\calE}$, and let $U \subseteq \complex$ be the largest open subset of $\complex$ such that $P(f\preim(U)) = 0$. The \emph{essential range} $\essran f$ of $f$ is the complement of $U$, and its \emph{essential supremum} is
+    %
+    \begin{equation*}
+        \norm{f}_\infty
+            = \set[\big]{\abs{\lambda}}{\lambda \in \essran f}
+    \end{equation*}
+    %
+    Furthermore, $f$ is said to be \emph{essentially bounded} with respect to $P$ if $\norm{f}_\infty < \infty$. The set of such functions is denoted $\calL^\infty(P)$.
+\end{definition}
+%
+Note that $\essran f$ is well-defined: Let $\calB$ be a countable basis for the topology on $\complex$, let $\calB_0$ be the collection of $B \in \calB$ with $P(f\preim(U)) = 0$, and put $U = \bigunion_{B \in \calB_0} B$. Then $\calB_0$ is countable, so since $P$ is countably additive we have
+%
+\begin{equation*}
+    P(f\preim(U))
+        = P \Bigl( \bigunion_{B \in \calB_0} f\preim(B) \Bigr)
+        = \sum_{B \in \calB_0} P(f\preim(B))
+        = 0.
+\end{equation*}
+%
+Furthermore, if $V \subseteq \complex$ is any open set with $P(f\preim(V)) = 0$, then $V$ is a union of elements in $\calB_0$. But then $V \subseteq U$, so $U$ is the largest such open set.
+
+Notice that the essential range of a function $f$ is always closed, and that it is bounded (i.e. compact) if and only if $f$ is essentially bounded.
+
+
+\begin{lemma}
+    Let $f \in \meas{\calE}$ and define a function $f^* \colon \Omega \to \complex$ by $f^*(x) = \conj{f(x)}$. Then the essential range of $f^*$ is
+    %
+    \begin{equation}
+        \label{eq:essran-involution}
+        \essran f^*
+            = \set{\conj{z}}{z \in \essran f}.
+    \end{equation}
+    %
+    In particular, if $f \in \calL^\infty(P)$ then also $f^* \in \calL^\infty(P)$.
+\end{lemma}
+
+\begin{proof}
+    Let $U = \complex \setminus \essran f$ and denote the complement of set of the right-hand side of \cref{eq:essran-involution} by $U^*$. The map $\phi \colon \complex \to \complex$ given by $\phi(z) = \conj{z}$ is then a homeomorphism and $f^* = \phi \circ f$. It follows that
+    %
+    \begin{equation*}
+        (f^*)\preim(U^*)
+            = (\phi \circ f)\preim(U^*)
+            = f\preim(\phi\preim(U^*))
+            = f\preim(U),
+    \end{equation*}
+    %
+    and hence $P((f^*)\preim(U^*)) = 0$ if and only if $P(f\preim(U)) = 0$, and the latter identity holds by definition of $U$. Since $U = \complex \setminus \essran f^*$ is the largest open set $V$ such that $P((f^*)\preim(V)) = 0$, it follows that $U^* \subseteq \complex \setminus \essran f^*$. This proves the inclusion \enquote{$\subseteq$} of \cref{eq:essran-involution}. The other inclusion follows by maximality of $U$.
+\end{proof}
+
+\begin{lemma}
+    The set $\calL^\infty(P)$ is a commutative $*$-algebra, and $\norm{\,\cdot\,}_\infty$ is a seminorm. This seminorm satisfies the inequality
+    %
+    \begin{equation}
+        \label{eq:Linfty-Banach-inequality}
+        \norm{fg}_\infty
+            \leq \norm{f}_\infty \norm{g}_\infty
+    \end{equation}
+    %
+    for all $f,g \in \calL^\infty(P)$.
+\end{lemma}
+
+\begin{proof}
+    We fist show that $\calL^\infty(P)$ is a vector space, so let $f,g \in \calL^\infty(P)$ and $\beta \in \complex$. Letting $t = \abs{\beta} \, \norm{f}_\infty + \norm{g}_\infty$ we have
+    %
+    \begin{equation*}
+        \{ \abs{\beta f + g} > t \}
+            \subseteq \{ \abs{f} > \norm{f}_\infty \}
+                      \union \{ \abs{g} > \norm{g}_\infty \}.
+    \end{equation*}
+    %
+    A moment's thought convinces us that the right-hand side is a $P$-null set, so $P( \{ \abs{\beta f + g} > t \}) = 0$. We then similarly have
+    %
+    \begin{equation*}
+        \norm{\beta f + g}_\infty
+            \leq t
+            = \abs{\beta} \, \norm{f}_\infty + \norm{g}_\infty,
+    \end{equation*}
+    %
+    showing that $\beta f + g \in \calL^\infty(P)$. Letting $\beta = 0$ confirms the triangle inequality. Instead choosing $g = 0$ shows that $\norm{\beta f}_\infty \leq \abs{\beta} \, \norm{f}_\infty$, and the opposite inequality (for $\beta \neq 0$) follows by substituting $\beta\inv$ for $\beta$. Hence $\norm{\,\cdot\,}_\infty$ is a seminorm.
+
+    Next we show that $fg \in \calL^\infty(P)$, so let $s = \norm{f}_\infty \norm{g}_\infty$. If $\abs{fg} > s$, then we must either have $\abs{f} > \norm{f}_\infty$ or $\abs{g} > \norm{g}_\infty$, so
+    %
+    \begin{equation*}
+        \set{\abs{fg} > s}
+            \subseteq \subseteq \{ \abs{f} > \norm{f}_\infty \}
+            \union \{ \abs{g} > \norm{g}_\infty \},
+    \end{equation*}
+    %
+    and repeating the above argument shows that $\norm{fg}_\infty \leq \norm{f}_\infty \norm{g}_\infty$. In particular $fg \in \calL^\infty(P)$.
+
+    Finally we note that the map $f \mapsto f^*$ is an involution on $\calL^\infty(P)$. [lemma] implies that $f^* \in \calL^\infty(P)$, and the rest is obvious from the definition of $f^*$.
+\end{proof}
+
+Next we consider the subspace of $\calL^\infty(P)$ consisting of those functions that are zero $P$-a.e.:
+%
+\begin{equation*}
+    \calN(P)
+        = \set{f \in \calL^\infty(P)}{\norm{f}_\infty = 0}.
+\end{equation*}
+%
+Notice that indeed $f \in \calN(P)$ if and only if the set on which $f \neq 0$ is a $P$-null set, since this set lies inside of the essential range of $f$. We now define the vector space $L^\infty(P) = \calL^\infty(P)/\calN(P)$. This inherits its algebraic structure from $\calL^\infty(P)$, and the triangle inequality implies that $\norm{f}_\infty = \norm{g}_\infty$ if $f-g \in \calN(P)$. Hence it makes sense to define the essential supremum of an equivalence class $[f] \in L^\infty(P)$ by $\norm{[f]}_\infty = \norm{f}_\infty$.
+
+In fact, if $f - g \in \calN(P)$ then also $\essran f = \essran g$: For if $U \subseteq \complex \setminus \essran f$ is open, then $P(f\preim(U)) = 0$. TODO: Show this. Also that it equals the spectrum of $[f]$.
+
+
+\begin{theorem}
+    The space $L^\infty(P)$ is a commutative C$^*$-algebra.
+\end{theorem}
+
+\begin{proof}
+\begin{proofsec}
+    \item[$L^\infty(P)$ is a Banach space]
+    Let $(f_n)_{n\in\naturals}$ be a sequence in $\calL^\infty(P)$ such that $([f_n])_{n\in\naturals}$ is a Cauchy sequence in $L^\infty(P)$. Let
+    %
+    \begin{equation*}
+        R
+            = \bigunion_{m,n\in\naturals} \{ \abs{f_n - f_m} > \norm{f_n - f_m}_\infty \}
+    \end{equation*}
+    %
+    and notice that $P(R) = 0$ since $R$ is a countable union of $P$-null sets. Letting $g_n = f_n \indicator{R^c}$ we thus have $g_n \sim f_n$. It follows that $\abs{g_n - g_m} \leq \norm{f_n - f_m}_\infty$, so $(g_n)_{n\in\naturals}$ is pointwise Cauchy and hence converges pointwise to a function $f \in \meas{\calE}$. We claim that $f \in \calL^\infty(P)$.
+
+    To this end, let $\epsilon > 0$ and choose $N \in \naturals$ such that $m,n \geq N$ implies that
+    %
+    \begin{equation*}
+        \abs{g_n - g_m}
+            \leq \norm{f_n - f_m}_\infty
+            < \epsilon.
+    \end{equation*}
+    %
+    Letting $m \to \infty$ we find that $\abs{g_n - f} \leq \epsilon$ for $n \geq N$ pointwise everywhere. The reverse triangle inequality then implies that
+    %
+    \begin{equation*}
+        \abs{f}
+            \leq \abs{g_N} + \epsilon
+            \leq \norm{g_N}_\infty + \epsilon,
+    \end{equation*}
+    %
+    so $f \in \calL^\infty(P)$. It finally follows that
+    %
+    \begin{equation*}
+        \norm{[f_n] - [f]}_\infty
+            = \norm{g_n - f}_\infty
+            \leq \epsilon
+    \end{equation*}
+    %
+    for $n \geq N$, proving that $[f_n] \to{} [f]$ as $n \to \infty$.
+
+    \item[$L^\infty(P)$ is a $*$-algebra]
+    The multiplication on $\calL^\infty(P)$ clearly induces a multiplication on $L^\infty(P)$. For the involution, simply note that this is an isometry, so $\calN(P)$ is invariant under it.
+
+    \item[$L^\infty(P)$ is a C$^*$-algebra]
+    Only the Banach inequality and the C$^*$-identity need to be proved. The former is just \cref{eq:Linfty-Banach-inequality}, so we prove the latter. First notice that
+    %
+    \begin{equation*}
+        \norm{ff^*}_\infty
+            \leq \norm{f}_\infty \norm{f^*}_\infty
+            \leq \norm{f}_\infty^2.
+    \end{equation*}
+    %
+    On the other hand we have
+    %
+    \begin{equation*}
+        \{ \abs{f} > \sqrt{\norm{ff^*}_\infty} \}
+            = \{ \abs{ff^*} > \norm{ff^*}_\infty \},
+    \end{equation*}
+    %
+    and the latter set is a $P$-null set, so $\norm{f}_\infty \leq \sqrt{\norm{ff^*}_\infty}$.
+\end{proofsec}
+\end{proof}
+
+The map $\Phi \colon \calM_b(\calE) \to \calL(\calH)$ given by $f \mapsto \int f \dif P$ is a $*$-homomorphism by Theorem~1.43, and it satisfies the inequality $\norm{\Phi(f)} \leq \norm{f}_{\sup}$. However, the opposite inequality clearly does not hold in general. We attempt to find an isometry $\Psi \colon \calL^\infty(P) \to \calL(\calH)$.
+
+First notice that $\calL^\infty(P) \subseteq \calL^1(P_{u,v})$ for all $u,v \in \calH$: For $f \in \calL^\infty(P)$ define a function $\tilde f = f \indicator{\Omega \setminus f\preim(\essran f)} \in \calM_b(\calE)$ and notice that $f = \tilde f$ $P$-a.e. Hence $f$ is also integrable and the $P_{u,v}$-integrals of the two functions agree. We thus define $\Psi(f)$ by requiring that
+%
+\begin{equation*}
+    \inner{\Psi(f)u}{v}
+        = \int f \dif P_{u,v}
+\end{equation*}
+%
+for all $u,v \in \calH$. We then clearly have $\Psi(f) = \Psi(\tilde f) = \Phi(\tilde f)$, so $\Psi$ is indeed an extension of $\Phi$. Let us write $\calL^1(P) = \bigintersect_{u,v \in \calH} \calL^1(P_{u,v,})$. Incidentally this extension from $\calM_b(\calE)$ to $\calL^1(P)$ is analogous to the extension from $C(\sigma(\calA))$ to $\calM_b(\borel{\sigma(\calA)})$.
+
+Next, notice that the image of $\tilde f$ is precisely its essential range, so $\norm{\tilde f}_\infty = \norm{\tilde f}_{\sup}$. It follows that
+%
+\begin{equation*}
+    \norm{\Psi(f)}
+        = \norm{\Phi(\tilde f)}
+        \leq \norm{\tilde f}_{\sup}
+        = \norm{\tilde f}_\infty
+        = \norm{f}_\infty.
+\end{equation*}
+%
+We prove the other inequality. We may assume that $f$ is bounded and that $\norm{f}_\infty > 0$. Let $\epsilon \in (0, \norm{f]_\infty})$ and put $E = \{ \abs{f} > \norm{f}_\infty - \epsilon \}$. Then $P(E) \neq 0$. For $v \in \calH$ with $\norm{v} = 1$ that lie in the range of the operator $P(E)$ we have $P_{v,v}(E) = \inner{P(E)v}{v} = \norm{v}^2 = 1$, so
+%
+\begin{equation*}
+    \norm{\Psi(f)v}^2
+        = \int \abs{f}^2 \dif P_{v,v}
+        \geq \bigl( \norm{f}_\infty - \epsilon \bigr)^2 P_{v,v}(E)
+        = \bigl( \norm{f}_\infty - \epsilon \bigr)^2.
+\end{equation*}
+%
+Taking square roots and letting $\epsilon \to 0$ then shows that
+%
+\begin{equation*}
+    \norm{f}_\infty
+        \leq \norm{\Psi(f)v}
+        \leq \norm{\Psi(f)} \, \norm{v}
+        = \norm{\Psi(f)}
+\end{equation*}
+%
+as claimed.
+
+
+\nocite{*}
+
+\printbibliography
+
+\end{document}
